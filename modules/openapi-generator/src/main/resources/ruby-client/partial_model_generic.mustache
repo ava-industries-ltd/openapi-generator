@@ -114,17 +114,19 @@
         fail ArgumentError, "The input argument (attributes) must be a hash in `{{{moduleName}}}::{{{classname}}}` initialize method"
       end
 
-      # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
-        if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `{{{moduleName}}}::{{{classname}}}`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+        symbolized_key = k.to_sym
+        unless acceptable_attributes.include?(symbolized_key)
+          fail ArgumentError, "`#{k}` is not a valid attribute in `{{{moduleName}}}::{{{classname}}}`. Please check the name to make sure it's valid. List of attributes: " + combined_attributes.keys.inspect
         end
-        h[k.to_sym] = v
+        h[symbolized_key] = v
       }
-      {{#parent}}
 
-      # call parent's initialize
-      super(attributes)
+      {{#parent}}
+      # call parent's initialize with combined attributes
+      parent_attribute_keys = self.class.superclass.attribute_map.keys
+      filtered_parent_attributes = attributes.slice(*parent_attribute_keys.map(&:to_sym))
+      super(filtered_parent_attributes)
       {{/parent}}
       {{#vars}}
 
