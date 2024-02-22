@@ -123,6 +123,7 @@
       }
 
       {{#parent}}
+      # Call the parent class initialize method
       parent_attribute_keys = self.class.superclass.attribute_map.keys
       filtered_parent_attributes = attributes.slice(*parent_attribute_keys.map(&:to_sym))
       super(filtered_parent_attributes)
